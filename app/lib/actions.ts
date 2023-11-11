@@ -15,6 +15,13 @@ const InvoiceSchema = z.object({
 
 const CreateInvoice = InvoiceSchema.omit({ id: true, date: true });
 
+/**
+ * 새로운 invoice를 생성합니다.
+ * @param formData
+ * @returns revalidate /dashboard/invoices
+ * @returns redirect to /dashboard/invoices
+ * @throws {z.ZodError}
+ */
 export async function createInvoice(formData: FormData) {
   // const rawForamData = {
   //   customerId: formData.get("customerId"),
@@ -42,6 +49,14 @@ export async function createInvoice(formData: FormData) {
 
 const UpdateInvoice = InvoiceSchema.omit({ date: true, id: true });
 
+/**
+ * 기존 invoice를 업데이트합니다.
+ * @param id
+ * @param formData
+ * @returns revalidate /dashboard/invoices
+ * @returns redirect to /dashboard/invoices
+ * @throws {z.ZodError}
+ */
 export async function updateInvoice(id: string, formData: FormData) {
   const { customerId, amount, status } = UpdateInvoice.parse({
     customerId: formData.get("customerId"),
@@ -59,4 +74,15 @@ export async function updateInvoice(id: string, formData: FormData) {
 
   revalidatePath("/dashboard/invoices");
   redirect("/dashboard/invoices");
+}
+
+/**
+ * 기존 invoice를 삭제합니다.
+ * @param id
+ * @returns revalidate /dashboard/invoices
+ */
+export async function deleteInvoice(id: string) {
+  await sql`DELETE FROM invoices WHERE id = ${id}`;
+
+  revalidatePath("/dashboard/invoices");
 }
